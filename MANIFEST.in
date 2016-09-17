@@ -1,0 +1,12 @@
+include README.md
+include LICENSE
+include AUTHORS
+include NOTICE
+include MANIFEST.in
+include requirements.txt
+recursive-include djangolearn/*
+recursive-include test_djangolearn/*
+
+
+include _version.py
+include versioneer.py
