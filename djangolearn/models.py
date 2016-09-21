@@ -93,7 +93,7 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
     to persistently store the binaries.
     """
 
-    storage_method = MachineLearningModelFileStorage
+    storage_model = MachineLearningModelFileStorage
 
     def __init__(self, model_object, *args, **kwargs):
         super(ScikitJobLibModelSerialiser, self).__init__(model_object, *args, **kwargs)
@@ -111,7 +111,7 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
             file_names = joblib.dump(trained_model, tmp_dir + '/' + model_file_name)
             # upload files
 
-            prev_storage_obj = self.storage_method.objects.filter(
+            prev_storage_obj = self.storage_model.objects.filter(
                 active=True,
                 model_handle=self.model_object,
             )
@@ -131,7 +131,7 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
                     else:
                         is_header = False
 
-                    storage_obj = self.storage_method.objects.create(
+                    storage_obj = self.storage_model.objects.create(
                         version=version,
                         identifier=file_name,
                         payload=File(file=file_content, name=file_name),
@@ -147,11 +147,11 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
 
         # get all files
         if version:
-            files = self.storage_method.objects.filter(
+            files = self.storage_model.objects.filter(
                 model_handle=self.model_object,
                 version=version)
         else:
-            files = self.storage_method.objects.filter(
+            files = self.storage_model.objects.filter(
                 model_handle=self.model_object,
                 active=True)
 
