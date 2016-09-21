@@ -1,8 +1,13 @@
 import pickle
 import sklearn
 import logging
-import tempfile
 import shutil
+
+try:
+    from tempfile import TemporaryDirectory
+except:
+    from .py3_utils import TemporaryDirectory
+
 from django.core.files.storage import default_storage
 
 
@@ -101,41 +106,39 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
         assert '/' not in model_file_name
 
         # Create tempdir
-        tmp_dir = tempfile.mkdtemp()
+        with TemporaryDirectory() as tmp_dir:
+            # save model & get list of all files
+            file_names = joblib.dump(trained_model, tmp_dir + '/' + model_file_name)
+            # upload files
 
-        # save model & get list of all files
-        file_names = joblib.dump(trained_model, tmp_dir + '/' + model_file_name)
-        # upload files
+            prev_storage_obj = self.storage_method.objects.filter(
+                active=True,
+                model_handle=self.model_object,
+            )
 
-        prev_storage_obj = self.storage_method.objects.filter(
-            active=True,
-            model_handle=self.model_object,
-        )
+            if prev_storage_obj:
+                version = prev_storage_obj.first().version
+                prev_storage_obj.update(active=False)
+                version = version + 1
+            else:
+                version = 1
 
-        if prev_storage_obj:
-            version = prev_storage_obj.first().version
-            prev_storage_obj.update(active=False)
-            version = version + 1
-        else:
-            version = 1
+            for file_name in file_names:
+                with open(file_name, 'r') as file_content:
+                    file_name = file_name.split('/')[-1]
+                    if file_name == model_file_name:
+                        is_header = True
+                    else:
+                        is_header = False
 
-        for file_name in file_names:
-            with open(file_name, 'r') as file_content:
-                file_name = file_name.split('/')[-1]
-                if file_name == model_file_name:
-                    is_header = True
-                else:
-                    is_header = False
+                    storage_obj = self.storage_method.objects.create(
+                        version=version,
+                        identifier=file_name,
+                        payload=File(file=file_content, name=file_name),
+                        model_handle=self.model_object,
+                        is_header=is_header,
+                    )
 
-                storage_obj = self.storage_method.objects.create(
-                    version=version,
-                    identifier=file_name,
-                    payload=File(file=file_content, name=file_name),
-                    model_handle=self.model_object,
-                    is_header=is_header,
-                )
-
-        shutil.rmtree(tmp_dir)
 
     def restore(self, version=None):
         # hardcoded for now
@@ -157,18 +160,18 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
                 "No model stored for %s!" % self.model_object)
 
         # Create tempdir
-        tmp_dir = tempfile.mkdtemp()
+        with TemporaryDirectory() as tmp_dir:
 
-        for storage_file in files:
+            for storage_file in files:
 
-            logger.debug("Reconstucting %s" % tmp_dir+'/'+storage_file.identifier)
-            fs_file = open(tmp_dir+'/'+storage_file.identifier,'ab+')
-            fs_file.write(storage_file.get_payload())
-            fs_file.seek(0)
+                logger.debug("Reconstucting %s" % tmp_dir+'/'+storage_file.identifier)
+                fs_file = open(tmp_dir+'/'+storage_file.identifier,'ab+')
+                fs_file.write(storage_file.get_payload())
+                fs_file.seek(0)
 
-        clf = joblib.load(tmp_dir + '/' + model_file_name)
-        # reconstruct
-        shutil.rmtree(tmp_dir)
+            # reconstruct
+            clf = joblib.load(tmp_dir + '/' + model_file_name)
+
         return clf
 
 
