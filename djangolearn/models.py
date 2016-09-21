@@ -94,6 +94,7 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
         super(ScikitJobLibModelSerialiser, self).__init__(model_object, *args, **kwargs)
 
     def store(self, trained_model):
+
         # hardcoded for now
         model_file_name = 'model.pkl'
 
@@ -105,6 +106,19 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
         # save model & get list of all files
         file_names = joblib.dump(trained_model, tmp_dir + '/' + model_file_name)
         # upload files
+
+        prev_storage_obj = self.storage_method.objects.filter(
+            active=True,
+            model_handle=self.model_object,
+        )
+
+        if prev_storage_obj:
+            version = prev_storage_obj.first().version
+            prev_storage_obj.update(active=False)
+            version = version + 1
+        else:
+            version = 1
+
         for file_name in file_names:
             with open(file_name, 'r') as file_content:
                 file_name = file_name.split('/')[-1]
@@ -114,6 +128,7 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
                     is_header = False
 
                 storage_obj = self.storage_method.objects.create(
+                    version=version,
                     identifier=file_name,
                     payload=File(file=file_content, name=file_name),
                     model_handle=self.model_object,
@@ -122,13 +137,20 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
 
         shutil.rmtree(tmp_dir)
 
-    def restore(self):
+    def restore(self, version=None):
         # hardcoded for now
         model_file_name = 'model.pkl'
         assert '/' not in model_file_name
 
         # get all files
-        files = self.storage_method.objects.filter(active=True)
+        if version:
+            files = self.storage_method.objects.filter(
+                model_handle=self.model_object,
+                version=version)
+        else:
+            files = self.storage_method.objects.filter(
+                model_handle=self.model_object,
+                active=True)
 
         if not files:
             raise ModelNotStoredException(
@@ -174,7 +196,7 @@ class MachineLearningModel(models.Model):
         serialiser_instance = self.serialiser(self)
         serialiser_instance.store(model)
 
-    def restore(self, data_library_version=None):
+    def restore(self, version=None, data_library_version=None):
 
         if not self.data_library_version:
             logger.warning(
@@ -195,7 +217,7 @@ class MachineLearningModel(models.Model):
             )
 
         serialiser_instance = self.serialiser(self)
-        self.loaded_model = serialiser_instance.restore()
+        self.loaded_model = serialiser_instance.restore(version=version)
         return self.loaded_model
 
 
