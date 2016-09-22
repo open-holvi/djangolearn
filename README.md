@@ -1,12 +1,12 @@
 # Django-Learn
-### A simplistic SciKitLearn Machine learning model persistance layer for django.
+### A simplistic SciKitLearn Machine learning model persistence layer for django.
 
 
 ## Basic Usage
 ```py
 from sklearn import svm
 from sklearn import datasets
-from djangolearn import SciKitLearnModel
+from djangolearn.models import SciKitLearnModel
 
 iris = datasets.load_iris()
 
@@ -42,7 +42,7 @@ specify it through the setting:
 DJANGOLEARN_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 ```
 
-Note that you will need to do the configuation management mentioned in the
+Note that you will need to do the configuration management mentioned in the
 Django Storage page.
 
 ## What's under the hood?
@@ -58,3 +58,9 @@ data have the same features.
 Every object de-serialization is dangerous. Only store models you trust and
 keep your model storage secure.
 We try to make basic validations of the models, but python can only go so far.
+
+
+## Requirements
+* Python 2.7 or Python 3.5
+* Django > 1.7
+* SciKitLearn >= 0.15
