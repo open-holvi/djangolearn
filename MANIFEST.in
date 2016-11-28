@@ -4,8 +4,9 @@ include AUTHORS
 include NOTICE
 include MANIFEST.in
 include requirements.txt
-recursive-include djangolearn/*
-recursive-include test_djangolearn/*
+include test_requirements.txt
+recursive-include djangolearn *.py *.md
+recursive-include test_djangolearn *.py *.md
 
 
 include _version.py

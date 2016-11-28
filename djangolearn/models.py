@@ -1,15 +1,15 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import pickle
 import sklearn
 import logging
 import shutil
-
 try:
     from tempfile import TemporaryDirectory
 except:
     from .py3_utils import TemporaryDirectory
 
 from django.core.files.storage import default_storage
-
 
 from django.db import models
 from django.core.files import File
@@ -139,7 +139,7 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
             # upload files
 
             for file_name in file_names:
-                with open(file_name, 'r') as file_content:
+                with open(file_name, mode='ab+') as file_content:
                     file_name = file_name.split('/')[-1]
                     if file_name == model_file_name:
                         is_header = True
@@ -149,7 +149,7 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
                     storage_obj = self.storage_model.objects.create(
                         version=version,
                         identifier=file_name,
-                        payload=File(file=file_content, name=file_name),
+                        payload=File(file_content),
                         model_handle=self.model_object,
                         is_header=is_header,
                         framework_version=self.framework_version,
@@ -196,7 +196,7 @@ class ScikitJobLibModelSerialiser(MachineLearningModelSerialiser):
             for storage_file in files:
 
                 logger.debug("Reconstucting %s" % tmp_dir+'/'+storage_file.identifier)
-                fs_file = open(tmp_dir+'/'+storage_file.identifier,'ab+')
+                fs_file = open(tmp_dir+'/'+storage_file.identifier, mode='ab+')
                 fs_file.write(storage_file.get_payload())
                 fs_file.seek(0)
 

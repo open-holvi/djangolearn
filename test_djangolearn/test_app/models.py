@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 from sklearn import svm
-from djangolearn import SciKitLearnModel
+from djangolearn.models import SciKitLearnModel
 from sklearn import datasets
 from sklearn import linear_model
 
