@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
 
     'djangolearn',
+    'test_djangolearn.test_app',
 ]
 
 TEMPLATES = [

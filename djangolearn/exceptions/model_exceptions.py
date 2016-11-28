@@ -8,7 +8,7 @@ class FrameworkVersionCollisionException(Exception):
     """Raised when a stored model has different version from expected."""
     pass
 
-class DataProcessingVersionCollisionException(Exception):
+class FeaturesVersionCollisionException(Exception):
     """Raised when a stored model has different version from expected."""
     pass
 
