@@ -58,10 +58,13 @@ data have the same features.
 ## Security
 Every object de-serialization is dangerous. Only store models you trust and
 keep your model storage secure.
-We try to make basic validations of the models, but python can only go so far.
+We try to make basic validations of the models, but python can only go so far. Use at your own risk.
 
+## Performance
+This is supposed to be an MVP for small jobs, and for playing around with machine learning in Django.
+Loading models at request time is not recomemdend.
 
 ## Requirements
-* Python 2.7 or Python 3.5
-* Django > 1.7
+* Python 2.7 3.4 3.5
+* Django > 1.7 (tests being deprecated for 1.7)
 * SciKitLearn >= 0.15
