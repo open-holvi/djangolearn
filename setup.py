@@ -14,10 +14,11 @@ from setuptools import setup, find_packages
 install_reqs = [str(req.req) for req in
                 parse_requirements("./requirements.txt", session={})]
 
-install_reqs = [str(req.req) for req in
+test_reqs = [str(req.req) for req in
                 parse_requirements("./test_requirements.txt", session={})]
 
-tests_require = install_reqs + install_reqs
+
+tests_require = install_reqs + test_reqs
 
 setup(
     name='djangolearn',
@@ -30,5 +31,6 @@ setup(
     zip_safe=False,
     include_package_data=True,
     test_suite="test_djangolearn.run_tests.run_all",
-    tests_require=tests_require
+    tests_require=tests_require,
+    setup_requires=['setuptools_scm'],
 )

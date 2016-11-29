@@ -1,0 +1,52 @@
+sudo: false
+language: python
+python:
+    - 2.7
+    - 3.4
+    - 3.5
+    - pypy
+
+addons:
+  apt:
+    packages:
+    - libblas-dev
+    - liblapack-dev
+    - gfortran
+ 
+cache:
+    apt: true
+    pip: true
+    directories:
+        - $HOME/download-cache
+
+before_install:
+    - mkdir -p $HOME/download-cache
+    - pip install --upgrade pip
+
+# Thins only works for py verisions that have pip with this option
+#    - pip install --only-binary=numpy,scipy numpy scipy
+install:
+    - pip install --upgrade setuptools
+    - pip install "Django${DJANGO_VERSION}"
+    - pip install --only-binary=numpy,scipy numpy scipy
+    - python setup.py clean build install
+    
+script:
+    - python setup.py test
+
+env:
+    global:
+        - NUMPY_VERSION="1.6.2" 
+        - SCIPY_VERSION="0.11.0" 
+
+    matrix:
+        - DJANGO_VERSION=">=1.8,<1.9"
+        - DJANGO_VERSION=">=1.9,<1.10"
+        - DJANGO_VERSION=">=1.10,<1.11"
+
+matrix:
+    allow_failures:
+        - python: 'pypy'
+
+notifications:
+    email: true

@@ -214,7 +214,28 @@ class MachineLearningModel(models.Model):
     model_class_name = models.CharField(
         max_length=128, blank=False, null=False)
 
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        get_latest_by = "create_time"
+        ordering = ('-create_time',)
+
     def store(self, model, features_version=None, framework_version=None, *args, **kwargs):
+
+        if not self.id:
+            try:
+                self.refresh_from_db()
+            except:
+                # compatibility with Django < 1.8
+                self.save()
+
+        # Lets double check:
+        if not self.id:
+            raise Exception(
+                "Cannot store a model without an ID.",
+                "please reload the model")
+
         serialiser_instance = self.serialiser(
             self,
             features_version=features_version,
