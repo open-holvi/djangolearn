@@ -1,7 +1,7 @@
 # Django-Learn
 ### A simplistic SciKitLearn Machine learning model persistence layer for django.
 
-[![Build Status](https://travis-ci.org/open-holvi/djangolearn.svg?branch=master)](https://travis-ci.org/open-holvi/djangolearn)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bd14b53e401548eb8324afa414f15f9c)](https://www.codacy.com/app/sergio_4/djangolearn?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=open-holvi/djangolearn&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/open-holvi/djangolearn.svg?branch=master)](https://travis-ci.org/open-holvi/djangolearn) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/bd14b53e401548eb8324afa414f15f9c)](https://www.codacy.com/app/sergio_4/djangolearn?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=open-holvi/djangolearn&amp;utm_campaign=Badge_Grade)
 
 ## Basic Usage
 ```py
